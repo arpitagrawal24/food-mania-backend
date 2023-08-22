@@ -2,6 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const connect = require("./db/connect");
 const User = require("./db/models/User");
+const Contact = require("./db/models/Contact");
+
 
 const port = process.env.PORT || 3000;
 
@@ -39,7 +41,7 @@ app.post("/signup", async (req, res) => {
 });
 
 // Route to login a user
-app.post("/login", async (req, res) => {
+app.get("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
     const userData = await User.findOne({ email });
@@ -57,6 +59,25 @@ app.post("/login", async (req, res) => {
     });
   } catch (error) {
     console.log(`error ${error}`);
+    res.status(500).send(`An error occurred. ${error}`);
+  }
+});
+
+
+// Route to post contact form data
+app.post("/contact", async (req, res) => {
+  try {
+
+    const { name, phone, email, message } = req.body;
+
+    const newContact = new Contact({ name, phone, email, message });
+    const savedContact = await newContact.save();
+    res.status(200).send({
+      message: "Contact form submitted successfully.",
+      contactData: savedContact,
+    });
+  } catch (error) {
+    console.log(`Error during contact form submission: ${error}`);
     res.status(500).send(`An error occurred. ${error}`);
   }
 });
@@ -87,9 +108,20 @@ app.post("/addproduct", async (req, res) => {
 });
 
 // Route to delete all documents in the "users" collection
-app.get("/delete", async (req, res) => {
+app.delete("/delete", async (req, res) => {
   try {
     const result = await User.deleteMany({});
+    res.status(200).send({ message: "All documents deleted.", result });
+  } catch (error) {
+    console.log(`error ${error}`);
+    res.status(500).send(`An error occurred. ${error}`);
+  }
+});
+
+// Route to delete all documents in the "contacts" collection
+app.delete("/deletecontact", async (req, res) => {
+  try {
+    const result = await Contact.deleteMany({});
     res.status(200).send({ message: "All documents deleted.", result });
   } catch (error) {
     console.log(`error ${error}`);

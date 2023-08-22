@@ -41,7 +41,7 @@ app.post("/signup", async (req, res) => {
 });
 
 // Route to login a user
-app.get("/login", async (req, res) => {
+app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
     const userData = await User.findOne({ email });
